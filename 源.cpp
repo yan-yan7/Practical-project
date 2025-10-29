@@ -1,0 +1,42 @@
+/*
+开发日志
+1.创建项目
+2.导入素材
+3.游戏界面
+开发流程：用户界面入手
+
+
+
+//创建游戏窗口
+//创建游戏背景(3背景速度不同，实现视觉效果；循环滚动)
+*/
+
+#include<stdio.h>
+#include<graphics.h>//基于“esayX”
+
+#define WIN_WIDTH 1012;
+#define WIN_HEIGHT 396;
+
+//初始化
+void init()
+{
+	//创建游戏窗口
+	initgraph(WIN_WIDTH, WIN_HEIGHT);
+}
+
+
+//渲染游戏背景
+void updateBg()
+{
+
+}
+
+int main(void)
+{
+	init();
+
+
+	updateBg();//
+
+	return 0;
+}
