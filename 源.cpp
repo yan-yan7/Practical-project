@@ -16,12 +16,42 @@
 坐标加载
 
 
+人物跳跃
+
+
+//创建游戏窗口
+//创建游戏背景(3背景速度不同，实现视觉效果；循环滚动)
+*/
+
+/*
+开发日志
+1.创建项目
+2.导入素材
+3.游戏界面
+开发流程：用户界面入手
+
+
+加载背景
+渲染
+找开源支持png透明图
+设置滚动速度和循环滚动
+
+
+加载人物
+坐标加载
+
+
+人物跳跃
+起跳和下落
+
+
 //创建游戏窗口
 //创建游戏背景(3背景速度不同，实现视觉效果；循环滚动)
 */
 
 #include<stdio.h>
 #include<graphics.h>//基于“esayX”
+#include<conio.h>
 #include"tools.h"
 
 #define WIN_WIDTH 1012
@@ -34,10 +64,12 @@ int speed[3] = { 1,3,6 };//滚动速度
 
 double heroX, heroY;
 int heroIndex = 0;
-
 IMAGE  imgHeros[12];//人物图片
 
 
+bool Jumphero;//人物正在跳跃
+int JumpheroMax;//最大高度
+int Jumpheroffo;//中间变量
 
 //初始化
 void init()
@@ -48,22 +80,26 @@ void init()
 	initgraph(WIN_WIDTH, WIN_HEIGHT);
 
 	char name[100];
-	for( i=0;i<3;i++)
+	for (i = 0; i < 3; i++)
 	{
 		sprintf_s(name, "res/bg%03d.png", i + 1);//图片所在文件
 		loadimage(&imgBgs[i], name);
 		bgX[i] = 0;
-		
+
 	}
 	for (i = 0; i < 12; i++)
 	{
-		sprintf_s(name, "res/hero%d.png",i+1);//图片所在文件
+		sprintf_s(name, "res/hero%d.png", i + 1);//图片所在文件
 		loadimage(&imgHeros[i], name);
 	}
 
 	heroX = WIN_WIDTH * 0.5 - imgHeros[0].getwidth() * 0.5;
-	heroY = 300- imgHeros[0].getheight() * 0.5;
-	
+	heroY = 345 - imgHeros[0].getheight() ;
+
+
+	Jumphero = false;
+	JumpheroMax = 345 - imgHeros[0].getheight() - 120;
+	Jumpheroffo = -4;
 }
 
 
@@ -71,7 +107,7 @@ void init()
 //渲染游戏背景
 void updateBg()
 {
-	
+
 	putimagePNG2(bgX[0], 0, &imgBgs[0]);
 	putimagePNG2(bgX[1], 119, &imgBgs[1]);
 	putimagePNG2(bgX[2], 330, &imgBgs[2]);
@@ -83,7 +119,7 @@ void updateBg()
 //滚动
 void fly()
 {
-	for (i = 0; i < 3;i++)
+	for (i = 0; i < 3; i++)
 	{
 		bgX[i] -= speed[i];//三图做差速度
 
@@ -93,25 +129,69 @@ void fly()
 		}
 	}
 	heroIndex = (heroIndex + 1) % 12;//人物
+
+	//实现跳跃
+
+	if (Jumphero)
+	{
+
+		if (heroY < JumpheroMax)
+		{
+			Jumpheroffo = 4;
+
+		}
+
+		heroY += Jumpheroffo;
+
+		if (heroY > 345 - imgHeros[0].getheight() )
+		{
+			Jumphero = false;//最高点
+			Jumpheroffo = -4;
+
+		}
+	}
+}
+
+void jump()
+{
+	Jumphero = true;
 }
 
 
+
+void keyEvent()//识别按键
+{
+	char ch;
+
+	if (_kbhit())//检测是否有按键按下
+	{
+		ch = _getch();//使用_getch()获取按键，无需回车
+
+		if (ch == ' ')//空格键跳跃
+		{
+			jump();
+		}
+	}
+}
 
 
 int main(void)
 {
 	init();
-	while (1) 
+	while (1)
 	{
+		keyEvent();//按键控制
+
+		
 		BeginBatchDraw();
 		updateBg();//渲染
-		putimagePNG2( heroX, heroY ,&imgHeros[heroIndex]);//人物踪迹
+		putimagePNG2(heroX, heroY, &imgHeros[heroIndex]);//人物踪迹
 		EndBatchDraw();
 		fly();//滚动
 		Sleep(30);//休眠
-	 }
-		
-	
-		system("pause");
+	}
+
+
+	system("pause");
 	return 0;
 }
