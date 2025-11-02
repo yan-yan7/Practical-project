@@ -45,6 +45,9 @@
 起跳和下落
 
 
+
+解决帧数等待
+
 //创建游戏窗口
 //创建游戏背景(3背景速度不同，实现视觉效果；循环滚动)
 */
@@ -71,6 +74,8 @@ bool Jumphero;//人物正在跳跃
 int JumpheroMax;//最大高度
 int Jumpheroffo;//中间变量
 
+
+int updata;//刷新
 //初始化
 void init()
 {
@@ -98,8 +103,9 @@ void init()
 
 
 	Jumphero = false;
-	JumpheroMax = 345 - imgHeros[0].getheight() - 120;
+	JumpheroMax = 345 - imgHeros[0].getheight() - 120;//maxhight
 	Jumpheroffo = -4;
+	updata = true;
 }
 
 
@@ -128,21 +134,27 @@ void fly()
 			bgX[i] = 0;//循环滚动
 		}
 	}
-	heroIndex = (heroIndex + 1) % 12;//人物
+	//heroIndex = (heroIndex + 1) % 12;//人物
+
+
+	if (!Jumphero)  // 不跳跃时才切换图片
+	{
+		heroIndex = (heroIndex + 1) % 12;
+	}
+
 
 	//实现跳跃
-
 	if (Jumphero)
 	{
-
+		//上升
 		if (heroY < JumpheroMax)
 		{
 			Jumpheroffo = 4;
 
 		}
-
 		heroY += Jumpheroffo;
 
+		//下降
 		if (heroY > 345 - imgHeros[0].getheight() )
 		{
 			Jumphero = false;//最高点
@@ -155,6 +167,7 @@ void fly()
 void jump()
 {
 	Jumphero = true;
+	updata = true;
 }
 
 
@@ -178,17 +191,27 @@ void keyEvent()//识别按键
 int main(void)
 {
 	init();
+	int times=0;//时间
 	while (1)
 	{
 		keyEvent();//按键控制
+		times += getDelay();//记录时间
+		if (times > 30) 
+		{
+		times = 0;
+		updata = true;
+	    }
 
-		
-		BeginBatchDraw();
-		updateBg();//渲染
-		putimagePNG2(heroX, heroY, &imgHeros[heroIndex]);//人物踪迹
-		EndBatchDraw();
-		fly();//滚动
-		Sleep(30);//休眠
+		if (updata)
+		{
+			updata = false;
+			BeginBatchDraw();
+			updateBg();//渲染
+			putimagePNG2(heroX, heroY, &imgHeros[heroIndex]);//人物踪迹
+			EndBatchDraw();
+			fly();//滚动
+		}
+		//Sleep(30);//休眠
 	}
 
 
